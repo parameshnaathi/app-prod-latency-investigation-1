@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  namespace: sre-lab
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: load-generator
+
+  template:
+    metadata:
+      labels:
+        app: load-generator
+
+    spec:
+      containers:
+        - name: load-generator
+          image: checkout-app:v2
+          imagePullPolicy: IfNotPresent
+
+          command:
+            - /bin/sh
+            - -c
+
+          args:
+            - |
+              while true; do
+                wget -qO- http://checkout/checkout >/dev/null
+                sleep 0.2
+              done
+
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
